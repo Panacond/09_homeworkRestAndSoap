@@ -12,13 +12,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RestLocalhost {
+public class RestLocalhostMethodGet {
     private HttpURLConnection connection;
     private int status;
     public String readRest(String response, String addResponse){
         BufferedReader reader;
         String line;
-        StringBuffer responseContent = new StringBuffer();
         String allData;
         try {
             URL url = new URL("http://localhost:8080" + addResponse);
@@ -32,20 +31,16 @@ public class RestLocalhost {
             status = connection.getResponseCode();
             System.out.println(status);
 
+            StringBuilder responseContent = new StringBuilder();
             if (status > 299) {
                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                while ((line = reader.readLine()) != null) {
-                    responseContent.append(line);
-                }
-                reader.close();
             } else {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                while ((line = reader.readLine()) != null) {
-                    responseContent.append(line);
-                }
-                reader.close();
             }
-//            System.out.println(responseContent.toString());
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+            reader.close();
             allData = responseContent.toString();
 
         } catch (MalformedURLException e) {
@@ -59,17 +54,19 @@ public class RestLocalhost {
         }
         return allData;
     }
-    public static String parce(String responseBody){
+    public String parce(String responseBody){
         JSONArray authors = new JSONArray(responseBody);
+        StringBuilder allDescription = new StringBuilder();
         for (int i = 0; i < authors.length(); i++){
             JSONObject author = authors.getJSONObject(i);
             int authorId = author.getInt("authorId");
             JSONObject authorName  = author.getJSONObject("authorName");
             String first = authorName.getString("first");
             String authorDescription = author.getString("authorDescription");
-            System.out.println(authorId + " " + first +  " || " + authorDescription);
+            allDescription.append(authorId).append(" | ").append(first).append(" | ").append(authorDescription).append("\n");
+            System.out.println(authorId + " | " + first +  " | " + authorDescription);
         }
-        return null;
+        return allDescription.toString();
     }
 
     public int getStatus() {
@@ -82,23 +79,9 @@ public class RestLocalhost {
         JSONObject authorName  = author.getJSONObject("authorName");
         String first = authorName.getString("first");
         String authorDescription = author.getString("authorDescription");
-        System.out.println(authorId + " " + first +  " || " + authorDescription);
+        String description = authorId + " | " + first +  " | " + authorDescription;
+        System.out.println(description);
         return  first;
-    }
-
-    public String parceTitle(String responseBody){
-        JSONArray albums = new JSONArray(responseBody);
-//        List response = (List) albums;
-        String result = "";
-        for (int i = 0; i < albums.length(); i++){
-            JSONObject album = albums.getJSONObject(i);
-            int id = album.getInt("id");
-            int userId = album.getInt("userId");
-            String title = album.getString("title");
-            result = result + " ;" + title;
-//            System.out.println(id + " " + userId + " " + title);
-        }
-        return result;
     }
 
     public List<JSONObject> parceList(String responseBody){

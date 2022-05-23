@@ -7,8 +7,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class RestLocalHostAllMethods {
-    private HttpURLConnection connection;
+import static java.nio.charset.StandardCharsets.*;
+
+public class RestLocalHostMethodPost {
     private int status;
     private String responseString;
 
@@ -16,7 +17,7 @@ public class RestLocalHostAllMethods {
         try {
             URL url = new URL("http://localhost:8080/api/library"+ addPart);
 
-            connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
@@ -27,21 +28,21 @@ public class RestLocalHostAllMethods {
 //            String jsonInputString = "{ \"authorId\": 1012, \"authorName\": { \"first\": \"string\", \"second\": \"string\" }, \"nationality\": \"string\", \"birth\": { \"date\": \"1973-03-28\", \"country\": \"string\", \"city\": \"string\" }, \"authorDescription\": \"string\"}";
             try (
                     OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes("utf-8");
+                byte[] input = jsonInputString.getBytes(UTF_8);
                 os.write(input, 0, input.length);
             }
             status = connection.getResponseCode();
             System.out.println(status);
             try (
                     BufferedReader br = new BufferedReader(
-                            new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                            new InputStreamReader(connection.getInputStream(), UTF_8))) {
                 StringBuilder response = new StringBuilder();
-                String responseLine = null;
+                String responseLine;
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }
                 responseString = response.toString();
-                System.out.println(response.toString());
+                System.out.println(response);
             }
 
         } catch (IOException e) {

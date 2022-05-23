@@ -10,26 +10,21 @@ public class RegexXml {
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(text);
         try {
-            m.find( );
-            result = m.group(1);
-            System.out.println("Found value: " + m.group(group));
+            String a = String.valueOf(m.find( ));
+            System.out.println(a);
+            result = m.group(group);
+            System.out.println("Found value: " + result);
         } catch (Exception e) {
             result = null;
             System.out.println("error");
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         // String to be scanned to find the pattern.
-        String line = "This order was placed for QT3000! OK?";
-        String pattern = "(.*)(\\d+)(.*)";
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(line);
-        try {
-            m.find( );
-            System.out.println("Found value: " + m.group(0));
-        } catch (Exception e) {
-            System.out.println("error");
-        }
+        String line = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">  <soap:Body>    <m:NumberToWordsResponse xmlns:m=\"http://www.dataaccess.com/webservicesserver/\">      <m:NumberToWordsResult>fifty </m:NumberToWordsResult>    </m:NumberToWordsResponse>  </soap:Body></soap:Envelope>\n" +
+                "Found value: <m:NumberToWordsResult>";
+        String pattern = "(<m:NumberToWordsResult>)([^<]*)";
+        System.out.println(new RegexXml(pattern,line, 2).result);
     }
 }
