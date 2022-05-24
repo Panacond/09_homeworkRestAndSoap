@@ -6,25 +6,26 @@ public class SoapTest {
 
     @Test
     public void postmanTest(){
-        String resultSearch = new Postman().getNumber2(50);
-        String expectation = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">  <soap:Body>    <m:NumberToWordsResponse xmlns:m=\"http://www.dataaccess.com/webservicesserver/\">      <m:NumberToWordsResult>fifty </m:NumberToWordsResult>    </m:NumberToWordsResponse>  </soap:Body></soap:Envelope>";
-        Assert.assertEquals(expectation, resultSearch);
+        Postman resultSearch = new Postman(50);
+        int responseCode = resultSearch.getResponseCode();
+        Assert.assertEquals(responseCode, 200, responseCode + "= 200");
+        Assert.assertEquals(resultSearch.getTextResult(), "fifty ");
     }
-    @Test
-    public void postmanTest2(){
-        String resultSearch = new Postman().getNumber2(50);
-        String number = new RegexXml("(<m:NumberToWordsResult>)([^<]*)", resultSearch, 2).result;
-        Assert.assertEquals(number, "fifty ");
-
-    }
-
 
     @Test
-    public void caclulatorTest2(){
-        Calculator item = new Calculator();
-        String value = item.getResultAdd2(2,2);
-        System.out.println(value);
-        String result = new RegexXml("(<AddResult>)([^<]*)",value, 2).result;
-        Assert.assertEquals(result, "4", result + "= 4");
+    public void calculatorAddTest(){
+        Calculator resultSearch = new Calculator(2, 3,operation.ADD);
+        int responseCode = resultSearch.getResponseCode();
+        Assert.assertEquals(responseCode, 200, responseCode + "= 200");
+        Assert.assertEquals(resultSearch.getTextResult(), "5", resultSearch.getTextResult() + "= 5");
     }
+
+    @Test
+    public void calculatorMultiplyTest(){
+        Calculator resultSearch = new Calculator(2, 3,operation.MULTIPLY);
+        int responseCode = resultSearch.getResponseCode();
+        Assert.assertEquals(responseCode, 200, responseCode + "= 200");
+        Assert.assertEquals(resultSearch.getTextResult(), "6", resultSearch.getTextResult() + "= 6");
+    }
+
 }

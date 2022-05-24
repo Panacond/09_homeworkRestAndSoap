@@ -1,0 +1,14 @@
+{
+  "authorId": 0,
+  "authorName": {
+    "first": "first_sting",
+    "second": "second_string"
+  },
+  "nationality": "nationality_string",
+  "birth": {
+    "date": "2000-01-01",
+    "country": "country_string",
+    "city": "city_string"
+  },
+  "authorDescription": "description_string"
+}

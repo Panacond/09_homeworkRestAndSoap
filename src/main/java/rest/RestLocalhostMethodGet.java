@@ -22,12 +22,9 @@ public class RestLocalhostMethodGet {
         try {
             URL url = new URL("http://localhost:8080" + addResponse);
             connection = (HttpURLConnection) url.openConnection();
-
-            // Request setup
             connection.setRequestMethod(response);
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
-
             status = connection.getResponseCode();
             System.out.println(status);
 

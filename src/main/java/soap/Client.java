@@ -6,19 +6,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class BaseParser {
-    public  String getPost(String url, String xml){
+public class Client {
+    protected String xmlBody;
+    protected int responseCode;
+    public Client(String url, String xml, String contentType){
+        this.getClient(url, xml, contentType);
+    }
+    public Client(String url, String xml){
         String contentType = "application/soap+xml; charset=utf-8";
-        return getBaseResponse(url, xml, contentType);
+        this.getClient(url, xml, contentType);
     }
 
-    public String getPostTextXml(String url, String xml){
-        String contentType = "text/xml; charset=utf-8";
-        return getBaseResponse(url, xml, contentType);
-    }
-
-    private String getBaseResponse(String url, String xml, String contentType) {
-        String getResponse;
+    private void getClient(String url, String xml, String contentType){
         try {
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -30,6 +29,7 @@ public class BaseParser {
             wr.writeBytes(xml);
             wr.flush();
             wr.close();
+            responseCode = con.getResponseCode();
             String responseStatus = con.getResponseMessage();
             System.out.println(responseStatus);
             BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -41,11 +41,17 @@ public class BaseParser {
             }
             in.close();
             System.out.println(response);
-            getResponse = response.toString();
+            xmlBody = response.toString();
         } catch (Exception e) {
-//            System.out.println(e);
-            getResponse = String.valueOf(e);
+            xmlBody = String.valueOf(e);
         }
-        return getResponse;
+    }
+
+    public String getXmlBody() {
+        return xmlBody;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 }

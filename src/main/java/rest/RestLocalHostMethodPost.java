@@ -23,9 +23,7 @@ public class RestLocalHostMethodPost {
             connection.setReadTimeout(5000);
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
             connection.setRequestProperty("Accept", "application/json");
-
             connection.setDoOutput(true);
-//            String jsonInputString = "{ \"authorId\": 1012, \"authorName\": { \"first\": \"string\", \"second\": \"string\" }, \"nationality\": \"string\", \"birth\": { \"date\": \"1973-03-28\", \"country\": \"string\", \"city\": \"string\" }, \"authorDescription\": \"string\"}";
             try (
                     OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonInputString.getBytes(UTF_8);
