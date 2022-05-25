@@ -116,7 +116,7 @@ public class RestAssuredTest {
 
         System.out.println(authorId);
         String first = "Silver";
-        String authorIdInt = Integer.toString(authorId.get(authorId.size()-1) + 1);
+        String authorIdInt = Integer.toString(authorId.get(authorId.size()-1));
         System.out.println(authorIdInt);
         String jsonInputString = FileRead.readFile("src/main/resources/author.json");
 

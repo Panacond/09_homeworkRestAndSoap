@@ -1,70 +1,76 @@
 package rest;
 
-import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import soap.FileRead;
-
+import soap.RegexXml;
 import java.util.List;
+import static rest.ParseJson.parceAuthor;
 
 public class RestTest {
-    @Test (enabled = false)
+    @Test
     public void getAuthors() {
-        RestLocalhostMethodGet item = new RestLocalhostMethodGet();
-
-        String result = item.readRest("GET", "/api/library/authors");
-        List<JSONObject> authors = item.parceList(result);
-        String parce = item.parce(result);
-        Assert.assertEquals(authors.size(), 10, authors.size() + " = 10");
-        Assert.assertTrue(parce.length() > 1000, "letters is more 1000 chapters");
-    }
-
-
-    @Test (enabled = false)
-    public void postAuthor() {
-        RestLocalHostMethodPost item = new RestLocalHostMethodPost();
-        String jsonInputString = FileRead.readFile("src/main/resources/author.json");
-        jsonInputString = jsonInputString.replace("0", "1013");
-        jsonInputString = jsonInputString.replace("first_sting", "Silver");
-
-        item.setMethod("POST", "/author", jsonInputString);
-        item.setMethod("POST", "/author", jsonInputString);
-        Assert.assertEquals(item.getStatus(), 409, item.getStatus() + " = 409");
+        HttpMethod httpGet = new HttpMethod(method.GET, "/api/library/authors?&pagination=false&");
+        Assert.assertEquals(httpGet.getStatus(),200);
+        List<Integer> authors = ParseJson.parceAuthorId(httpGet.getResponseJsonBody());
+        System.out.println(authors);
+        Assert.assertFalse(authors.isEmpty(), "List isn't empty");
     }
 
 
     @Test
-    public void bigTestData() {
-        RestLocalHostMethodPost item = new RestLocalHostMethodPost();
-        String jsonInputString = FileRead.readFile("src/main/resources/author.json");
-        jsonInputString = jsonInputString.replace("0", "1013");
-        jsonInputString = jsonInputString.replace("first_sting", "Silver");
-        item.setMethod("POST", "/author", jsonInputString);
+    public void postAuthor() {
+        HttpMethod httpGet = new HttpMethod(method.GET, "/api/library/authors?&pagination=false&");
+        Assert.assertEquals(httpGet.getStatus(),200);
+        List<Integer> authors = ParseJson.parceAuthorId(httpGet.getResponseJsonBody());
+        String nextAuthor = Integer.toString(authors.size());
 
-        RestLocalhostMethodGet itemSecond = new RestLocalhostMethodGet();
-        itemSecond.readRest("DELETE", "/api/library/author/1013");
-        Assert.assertEquals(itemSecond.getStatus(), 204, itemSecond.getStatus() + "= 204");
+        String jsonInputString = FileRead.readFile("src/main/resources/author.json");
+        String first = "Silver";
+        jsonInputString = jsonInputString.replace("0,", nextAuthor +",");
+        jsonInputString = jsonInputString.replace("first_sting", first);
+
+        httpGet = new HttpMethod(method.POST, "/api/library/author",jsonInputString);
+        Assert.assertEquals(httpGet.getStatus(), 201);
+        String firstResponse =  new RegexXml("(\"first\":\")([^\"]*)",httpGet.getResponseJsonBody(), 2).result;
+        Assert.assertEquals(first, firstResponse);
+
+        httpGet = new HttpMethod(method.POST,"/api/library/author", jsonInputString);
+        Assert.assertEquals(httpGet.getStatus(), 409);
     }
 
-    @Test (enabled = false)
+
+    @Test
+    public void deleteAuthor() {
+        HttpMethod httpGet = new HttpMethod(method.GET, "/api/library/authors?&pagination=false&");
+        Assert.assertEquals(httpGet.getStatus(),200);
+        List<Integer> authors = ParseJson.parceAuthorId(httpGet.getResponseJsonBody());
+        String nextAuthor = Integer.toString(authors.get(3));
+
+        httpGet = new HttpMethod(method.DELETE, "/api/library/author/"+nextAuthor +"?&forcibly=true&");
+        Assert.assertEquals(httpGet.getStatus(),204);
+
+        httpGet = new HttpMethod(method.GET, "/api/library/authors?&pagination=false&");
+        Assert.assertEquals(httpGet.getStatus(),200);
+        List<Integer> authorsSecond = ParseJson.parceAuthorId(httpGet.getResponseJsonBody());
+        Assert.assertNotEquals(authors.get(3), authorsSecond.get(3), "Items of lists is single!");
+    }
+
+    @Test
     public void putAuthor() {
-        RestLocalHostMethodPost item = new RestLocalHostMethodPost();
-        String jsonInputString = FileRead.readFile("src/main/resources/author.json");
-        jsonInputString.replace("0", "1013");
-        jsonInputString.replace("first_sting", "Silver");
-        item.setMethod("PUT", "/author/", jsonInputString);
-        Assert.assertEquals(item.getStatus(), 200, item.getStatus() + " = 200");
-        String response = item.getResponseString();
-        jsonInputString = jsonInputString.replace(" ", "");
-        jsonInputString = jsonInputString.replace("\n", "");
-        Assert.assertEquals(response, jsonInputString);
-    }
+        HttpMethod httpGet = new HttpMethod(method.GET, "/api/library/authors?&pagination=false&");
+        Assert.assertEquals(httpGet.getStatus(),200);
+        List<Integer> authors = ParseJson.parceAuthorId(httpGet.getResponseJsonBody());
+        String nextAuthor = Integer.toString(authors.get(3));
 
-    @Test (enabled = false)
-    public void getAuthorId() {
-        RestLocalhostMethodGet item = new RestLocalhostMethodGet();
-        String result = item.readRest("GET", "/api/library/author/0");
-        String first = RestLocalhostMethodGet.parceAuthor(result);
-        Assert.assertEquals(first, "go", first + " = go");
+        String jsonInputString = FileRead.readFile("src/main/resources/author.json");
+        jsonInputString = jsonInputString.replace("0,", nextAuthor +",");
+        String first = "Gold";
+        jsonInputString = jsonInputString.replace("first_sting", first);
+
+        httpGet = new HttpMethod(method.PUT,"/api/library/author", jsonInputString);
+        Assert.assertEquals(httpGet.getStatus(),200);
+        String firstResponse = parceAuthor(httpGet.getResponseJsonBody());
+        Assert.assertEquals( firstResponse, first);
     }
 }

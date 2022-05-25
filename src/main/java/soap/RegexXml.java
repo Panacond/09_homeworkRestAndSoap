@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexXml {
-    String result;
+    public String result;
     public RegexXml(String pattern, String text, int group) {
 
         Pattern r = Pattern.compile(pattern);
